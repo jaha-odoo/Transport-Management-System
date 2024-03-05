@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Define a new tree view for fleet.vehicle.model.category -->
+    <record id="fleet_vehicle_category_tree_view" model="ir.ui.view">
+        <!-- Unique identifier for the view -->
+        <field name="name">fleet.vehicle.category.tree</field>
+        <!-- Model associated with the view -->
+        <field name="model">fleet.vehicle.model.category</field>
+        <!-- Inherit the existing tree view 'fleet.fleet_vehicle_model_category_view_tree' -->
+        <field name="inherit_id" ref="fleet.fleet_vehicle_model_category_view_tree"/>
+        <field name="arch" type="xml">
+            <!-- Insert the 'max_weight' and 'max_volume' fields after the 'name' field in the view -->
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="max_weight"/>
+                <field name="max_volume"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

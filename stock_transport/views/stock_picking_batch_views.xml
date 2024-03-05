@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Define a new form view for stock.picking.batch -->
+    <record id="stock_picking_batch_form_view" model="ir.ui.view">
+        <field name="name">stock.picking.batch.form</field>
+        <field name="model">stock.picking.batch</field>
+        <!-- Inherit the existing form view for stock.picking.batch -->
+        <field name="inherit_id" ref="stock_picking_batch.stock_picking_batch_form"/>
+        <field name="arch" type="xml">
+            <!-- Insert the dock_id, vehicle_id, and vehicle_category_id fields after the scheduled_date field -->
+            <xpath expr="//field[@name='scheduled_date']" position="after">
+                <field name="dock_id"/>
+                <field name="vehicle_id"/>
+                <!-- Display the vehicle_category_id with a placeholder -->
+                <field name="vehicle_category_id" placeholder="Semi-Truck (200.0kg, 23.0m³)"/>
+                <!-- Display the weight and volume fields as progress bars, but only if vehicle_category_id is not False -->
+                <field name="weight" readonly="1" widget="progressbar" invisible= "vehicle_category_id == False"/>
+                <field name="volume" readonly="1" widget="progressbar" invisible= "vehicle_category_id == False" />
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Define a new graph view for stock.picking.batch -->
+    <record id="stock_picking_batch_graph_view" model="ir.ui.view">
+        <field name="name">stock.picking.batch.graph</field>
+        <field name="model">stock.picking.batch</field>
+        <field name="arch" type="xml">
+            <!-- Display a bar graph showing the average weight and volume for each vehicle category, grouped by day_of_date -->
+            <graph string="Batch Weight, Volume, and Date by Vehicle Category" type="bar">
+                <field name="vehicle_category_id" type="col"/>
+                <field name="weight" type="measure" operator="avg"/>
+                <field name="volume" type="measure" operator="avg"/>
+                <field name="day_of_date" type="row"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Define an action to open the stock.picking.batch model with tree, kanban, form, and graph views -->
+    <record id="stock_picking_batch.stock_picking_batch_action" model="ir.actions.act_window">
+        <field name="name">Batch Transfers</field>
+        <field name="res_model">stock.picking.batch</field>
+        <field name="view_mode">tree,kanban,form,graph</field>
+    </record>
+</odoo>

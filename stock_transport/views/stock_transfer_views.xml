@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Define a new tree view for stock.picking -->
+    <record id="stock_picking_tree_view" model="ir.ui.view">
+        <!-- Unique identifier for the view -->
+        <field name="name">stock.picking.tree</field>
+        <!-- Model associated with the view -->
+        <field name="model">stock.picking</field>
+        <!-- Inherit the existing tree view 'stock.vpicktree' -->
+        <field name="inherit_id" ref="stock.vpicktree"/>
+        <field name="arch" type="xml">
+            <!-- Insert the 'volume' field after the 'scheduled_date' field in the view -->
+            <xpath expr="//field[@name='scheduled_date']" position="after">
+                <field name="volume"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
