@@ -14,8 +14,8 @@
                 <!-- Display the vehicle_category_id with a placeholder -->
                 <field name="vehicle_category_id" placeholder="Semi-Truck (200.0kg, 23.0m³)"/>
                 <!-- Display the weight and volume fields as progress bars, but only if vehicle_category_id is not False -->
-                <field name="weight" readonly="1" widget="progressbar" invisible= "vehicle_category_id == False"/>
-                <field name="volume" readonly="1" widget="progressbar" invisible= "vehicle_category_id == False" />
+                <field name="weight" widget="progressbar" invisible= "vehicle_category_id == False"/>
+                <field name="volume" widget="progressbar" invisible= "vehicle_category_id == False" />
             </xpath>
         </field>
     </record>
@@ -27,18 +27,58 @@
         <field name="arch" type="xml">
             <!-- Display a bar graph showing the average weight and volume for each vehicle category, grouped by day_of_date -->
             <graph string="Batch Weight, Volume, and Date by Vehicle Category" type="bar">
-                <field name="vehicle_category_id" type="col"/>
-                <field name="weight" type="measure" operator="avg"/>
-                <field name="volume" type="measure" operator="avg"/>
-                <field name="day_of_date" type="row"/>
+                <field name="scheduled_date" type="row" interval="day"/>
+                <field name="vehicle_category_id" type="col" />
+                <field name="weight"  />
+                <field name="volume" />
+                <field name="transfer_count"  />
+                <field name="move_line_count" />
             </graph>
         </field>
     </record>
+
+    <record id="stock_picking_batch_gantt_view" model="ir.ui.view">
+        <field name="name">stock.picking.batch.gantt</field>
+        <field name="model">stock.picking.batch</field>
+        <field name="arch" type="xml">
+            <!-- Define a Gantt view for stock.picking.batch -->
+            <gantt color="id" date_stop="scheduled_date" date_start="date" default_group_by="vehicle_id,dock_id" default_scale="week" decoration-info="state=='draft'">
+
+                <!-- Display weight, volume, and state fields -->
+                <field name="weight"/>
+                <field name="volume"/>
+                <field name="state"/>
+
+                <!-- Define custom templates for the Gantt view -->
+                <templates>
+                    <div class="container-fluid">
+                        <div class="row g-0">
+                            <div class="col">
+                                <ul class="ps-1 mb-0 list-unstyled">
+                                    <!-- Display weight -->
+                                    <li>
+                                        <strong>Weight: </strong>
+                                        <t t-esc="weight"/>
+                                    </li>
+                                    <!-- Display volume -->
+                                    <li>
+                                        <strong>Volume: </strong>
+                                        <t t-esc="volume"/>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </templates>
+            </gantt>
+        </field>
+    </record>
+
 
     <!-- Define an action to open the stock.picking.batch model with tree, kanban, form, and graph views -->
     <record id="stock_picking_batch.stock_picking_batch_action" model="ir.actions.act_window">
         <field name="name">Batch Transfers</field>
         <field name="res_model">stock.picking.batch</field>
-        <field name="view_mode">tree,kanban,form,graph</field>
+        <field name="view_mode">tree,kanban,form,graph,gantt</field>
     </record>
 </odoo>

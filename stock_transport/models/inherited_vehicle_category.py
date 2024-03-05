@@ -15,3 +15,4 @@ class VehicleCategory(models.Model):
         for category in self:
             # Update the display_name field with a formatted string
             category.display_name = f"{category.name} ({category.max_weight}kg, {category.max_volume}m³)"
+       
