@@ -26,6 +26,16 @@ class StockPickingBatch(models.Model):
     # Add a date field with today's date as default value
     date = fields.Date(string="Today's Date", default=fields.Date.today())
 
+    # Define a Float field for total weight, computed and readonly
+    total_weight = fields.Float(
+        string="Total Weight", compute="_compute_weight", store=True
+    )
+
+    # Define a Float field for total volume, computed and readonly
+    total_volume = fields.Float(
+        string="Total Volume", compute="_compute_volume", store=True
+    )
+
     # Define fields for counts of transfers and move lines
     transfer_count = fields.Integer(
         string="Transfer Count",
@@ -45,6 +55,7 @@ class StockPickingBatch(models.Model):
     def _compute_volume(self):
         for batch in self:
             total_volume = sum(picking.volume for picking in batch.picking_ids)
+            batch.total_volume = total_volume
             if batch.vehicle_category_id:
                 max_volume = batch.vehicle_category_id.max_volume
                 batch.volume = total_volume / max_volume if max_volume else 0.0
@@ -56,6 +67,7 @@ class StockPickingBatch(models.Model):
     def _compute_weight(self):
         for batch in self:
             total_weight = sum(picking.weight for picking in batch.picking_ids)
+            batch.total_weight = total_weight
             if batch.vehicle_category_id:
                 max_weight = batch.vehicle_category_id.max_weight
                 batch.weight = total_weight / max_weight if max_weight else 0.0
@@ -66,7 +78,7 @@ class StockPickingBatch(models.Model):
     @api.depends("weight", "volume")
     def _compute_display_name(self):
         for batch in self:
-            batch.display_name = f"{batch.name} ({batch.weight* batch.vehicle_category_id.max_weight} kg, {batch.volume * batch.vehicle_category_id.max_volume} m³)"
+            batch.display_name = f"{batch.name} ({batch.total_weight} kg, {batch.total_volume} m³)"
 
     # Compute method to calculate the number of transfers in the batch
     @api.depends("picking_ids")

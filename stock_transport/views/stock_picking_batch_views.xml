@@ -10,12 +10,22 @@
             <!-- Insert the dock_id, vehicle_id, and vehicle_category_id fields after the scheduled_date field -->
             <xpath expr="//field[@name='scheduled_date']" position="after">
                 <field name="dock_id"/>
-                <field name="vehicle_id"/>
+                <field name="vehicle_id" placeholder="Third Party Provider"/>
                 <!-- Display the vehicle_category_id with a placeholder -->
                 <field name="vehicle_category_id" placeholder="Semi-Truck (200.0kg, 23.0m³)"/>
                 <!-- Display the weight and volume fields as progress bars, but only if vehicle_category_id is not False -->
-                <field name="weight" widget="progressbar" invisible= "vehicle_category_id == False"/>
-                <field name="volume" widget="progressbar" invisible= "vehicle_category_id == False" />
+
+
+                <label for='weight' string="Weight" />
+                <div class="o_row">
+                    <field name="total_weight" />
+                    <field name="weight" widget="progressbar" no_label="1"  invisible= "vehicle_category_id == False" />
+                </div>
+                <label for='volume' string="Volume" />
+                <div class="o_row">
+                    <field name="total_volume" />
+                    <field name="volume" widget="progressbar" no_label="1"  invisible= "vehicle_category_id == False" />
+                </div>
             </xpath>
         </field>
     </record>
@@ -29,9 +39,9 @@
             <graph string="Batch Weight, Volume, and Date by Vehicle Category" type="bar">
                 <field name="scheduled_date" type="row" interval="day"/>
                 <field name="vehicle_category_id" type="col" />
-                <field name="weight"  />
-                <field name="volume" />
-                <field name="transfer_count"  />
+                <field name="total_weight" />
+                <field name="total_volume" />
+                <field name="transfer_count" />
                 <field name="move_line_count" />
             </graph>
         </field>
@@ -42,34 +52,8 @@
         <field name="model">stock.picking.batch</field>
         <field name="arch" type="xml">
             <!-- Define a Gantt view for stock.picking.batch -->
-            <gantt color="id" date_stop="scheduled_date" date_start="date" default_group_by="vehicle_id,dock_id" default_scale="week" decoration-info="state=='draft'">
-
-                <!-- Display weight, volume, and state fields -->
-                <field name="weight"/>
-                <field name="volume"/>
-                <field name="state"/>
-
-                <!-- Define custom templates for the Gantt view -->
-                <templates>
-                    <div class="container-fluid">
-                        <div class="row g-0">
-                            <div class="col">
-                                <ul class="ps-1 mb-0 list-unstyled">
-                                    <!-- Display weight -->
-                                    <li>
-                                        <strong>Weight: </strong>
-                                        <t t-esc="weight"/>
-                                    </li>
-                                    <!-- Display volume -->
-                                    <li>
-                                        <strong>Volume: </strong>
-                                        <t t-esc="volume"/>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </templates>
+            <gantt color="id" date_stop="scheduled_date" date_start="date" default_group_by="vehicle_id,dock_id" default_scale="week" pill_label="True" precision="{'day': 'hour:full', 'week': 'day:full', 'month': 'day:full', 'year': 'day:full'}" string="Schedule" thumbnails="{'user_id':'image_1920'}" decoration-info="state=='draft'">
+                <field name="state" />
             </gantt>
         </field>
     </record>
